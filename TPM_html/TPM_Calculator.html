@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPM Calculator</title>
+    <link rel="stylesheet" href="TPM_Calculator.css">
+</head>
+<body>
+
+<h2>TPM Calculator</h2>
+
+<h3>Input Read Counts</h3>
+
+<table id="inputTable">
+    <thead>
+        <tr>
+            <th>Gene Name</th>
+            <th>Gene Length (bp)</th>
+            <th>WT Counts</th>
+            <th>Mutant Counts</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><input type="text" class="gene-name" placeholder="Gene1"></td>
+            <td><input type="number" class="gene-length" placeholder="1.5"></td>
+            <td><input type="number" class="wt" /></td>
+            <td><input type="number" class="mutant" /></td>
+        </tr>
+    </tbody>
+</table>
+
+<button onclick="addRow()">Add Gene</button>
+<button onclick="loadExample()">Load Example</button>
+<button onclick="calculateTPM()">Calculate TPM</button>
+
+<h3>Results</h3>
+
+<h4>TPM Values</h4>
+
+<table id="resultsTable">
+    <thead>
+        <tr>
+            <th>Gene Name</th>
+            <th>WT TPM</th>
+            <th>Mutant TPM</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="col-md-4">
+    <!-- Adjust the width and height as needed -->
+    <img src="Cyndi.jpg" alt="Descriptive text" class="img-fluid homepage-img">
+</div>
+
+<script src="TPM_Calculator.js"></script>
+
+</body>
+</html>
+
+
