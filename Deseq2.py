@@ -12,29 +12,40 @@ from Translator import Translator
 from Preprocessing import Preprocessing
 
 class DifferentialExpression:
-    def __init__(self, output_path, processed_data):
+    def __init__(self, path = './Result_file/', file_name = 'Preprocess_TS_Count.xlsx', save_path = './Result_file/'):
         # Read preprocessed count file
-        self.output_path = output_path
-        self.processed_data = processed_data
+        self.path = path
+        self.file_name = file_name
+        self.save_path = save_path
+        self.pre_data = pd.read_excel(os.path.join(self.path, self.file_name))
         self.counts = None
         self.matadata= None
-        self.estimated_gene = None  # Estimated gene expression dataframe
-        self.result = None  # DESeq2 result dataframe
+        self.norm_counts = None  # Normalization read counts 
+        self.result = None  # DESeq2 result 
 
-    def prepare_count_data(self):
-        # Convert your preprocessed data into the format required by pydeseq2
-        # Get Processed Read counts
-        counts = self.processed_data[['transcript_id', 'Rap1Del_2', 'Rap1Del_3', 'Rap1Del_4', 'Rap1WT_1','Rap1WT_2', 'Rap1WT_3']] 
-        counts.set_index("transcript_id", inplace = True)
+    def prepare_dds(self):
+        # Prepare the files (counts / meta data) required by pydeseq2
+        
+        # Get Columns Names from Processed Excel File 
+        cols = list(self.pre_data.columns)
+        self.id = str(cols[0])
+        self.sample_cols = list(cols[1:])
+
+        # <Count> data contains the gene id and original read counts
+        counts = self.pre_data[cols] 
+        counts.set_index(f'{self.id}', inplace = True)
         counts = counts.astype(int) # Convert values to "int"
         counts = counts.T # 將 Dataframe 轉置
         self.counts = counts
         
-    def prepare_meta_data(self):
         # <metadata> contains the condition design in this experement
-        metadata = pd.DataFrame(zip(self.counts.index, ['Rap1Del', 'Rap1Del', 'Rap1Del', 'Rap1WT', 'Rap1WT', 'Rap1WT']), columns = ['sample','condition'] )
+        sample = self.sample_cols
+        condition = [x[:-2] for x in self.sample_cols]
+        metadata = pd.DataFrame(zip(sample, condition ), 
+                                columns = ['sample','condition'] )
         metadata.set_index('sample', inplace =True)
         self.metadata = metadata
+        print(self.metadata)
 
     def run_deseq2_analysis(self):
         dds = DeseqDataSet(
@@ -46,39 +57,26 @@ class DifferentialExpression:
         
         # Run DDS
         dds.deseq2()
-        deseq2_result = DeseqStats(dds, contrast = ('condition','Rap1Del','Rap1WT'), alpha=0.05, cooks_filter=True, independent_filter=True)
+        condition = [x[:-2] for x in self.sample_cols]
+        conditionA = condition[0]
+        conditoinB =condition[-1]
+        deseq2_result = DeseqStats(dds, contrast = ('condition',str(conditionA),str(conditoinB)),
+                                   alpha=0.05, cooks_filter=True, independent_filter=True)
+        # Run statistical result
         deseq2_result.summary()
 
         # Get the DESeq2 result
-        result_df = deseq2_result.results_df
-        
-        # Get the ORF, Gene name, Discription by pre-build dictionary  
-        id_orf_transform, id_gene_name_transform, id_discription_transform = Translator()
-        result_df.insert(0, 'ID', result_df.index)
-        result_df.insert(1, 'Orf', result_df['ID'].map(id_orf_transform))
-        result_df.insert(2, 'Gene', result_df['ID'].map(id_gene_name_transform))
-        result_df.insert(3, 'Discription', result_df['ID'].map(id_discription_transform))
-        self.result = result_df
+        self.result = deseq2_result.results_df
 
-        # Get the Estimated Gene Expression
-        estimated_gene_expression = dds.layers['normed_counts']
-        estimated_df = pd.DataFrame(estimated_gene_expression.T, 
-                                                    index=dds.var.index, columns=dds.obs.index) # Turn to dataframe
-        estimated_df.insert(0, 'ID', estimated_df.index)
-        estimated_df.insert(1, 'Orf', estimated_df['ID'].map(id_orf_transform))
-        estimated_df.insert(2, 'Gene', estimated_df['ID'].map(id_gene_name_transform))
-        self.estimated_gene = estimated_df
+        # Get Normalization counts and Turn into dataframe
+        self.norm_counts = pd.DataFrame(dds.layers['normed_counts'].T, index=dds.var.index, columns=dds.obs.index) 
 
     def save_results(self):
-        self.result.to_excel(os.path.join(self.output_path, 'DESeq2_result.xlsx'), index=False)
-        self.estimated_gene.to_excel(os.path.join(self.output_path, 'Estimated_gene.xlsx'), index=False)
+        self.result.to_excel(os.path.join(self.save_path, 'DESeq2_result.xlsx'))
+        self.norm_counts.to_excel(os.path.join(self.save_path, 'Normalizatoin_counts.xlsx'))
 
 if __name__ == '__main__':
-    path = './Rap1/Data/'
-    file_name = 'Preprocess_TS_Count.xlsx'
-    processed_data = pd.read_excel(os.path.join(path,file_name))
-    DE = DifferentialExpression(output_path = path, processed_data = processed_data)
-    DE.prepare_count_data()
-    DE.prepare_meta_data()
+    DE = DifferentialExpression()
+    DE.prepare_dds()
     DE.run_deseq2_analysis()
     DE.save_results()
