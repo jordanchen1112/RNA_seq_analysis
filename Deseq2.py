@@ -70,13 +70,20 @@ class DifferentialExpression:
 
         # Get Normalization counts and Turn into dataframe
         self.norm_counts = pd.DataFrame(dds.layers['normed_counts'].T, index=dds.var.index, columns=dds.obs.index) 
+    
+    def add_info(self):
+        fasta_file='./GSEA_CGD_Data/C_albicans_SC5314_A22_current_orf_coding.fasta'
+        gene_info_df, orf_transform, gene_name_transform, description_transform = Translator(fasta_file = fasta_file)
+        self.result = self.result.merge(gene_info_df, on='ID', how='left')
+        self.norm_counts = self.norm_counts.merge(gene_info_df, on='ID', how='left')
 
     def save_results(self):
-        self.result.to_excel(os.path.join(self.save_path, 'DESeq2_result.xlsx'))
-        self.norm_counts.to_excel(os.path.join(self.save_path, 'Normalizatoin_counts.xlsx'))
+        self.result.to_excel(os.path.join(self.save_path, 'DESeq2_result.xlsx'), index = False)
+        self.norm_counts.to_excel(os.path.join(self.save_path, 'Normalizatoin_counts.xlsx'), index = False)
 
 if __name__ == '__main__':
     DE = DifferentialExpression()
     DE.prepare_dds()
     DE.run_deseq2_analysis()
+    DE.add_info()
     DE.save_results()
