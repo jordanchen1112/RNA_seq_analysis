@@ -1,0 +1,10 @@
+pandas==1.3.2
+matplotlib==3.4.3
+seaborn==0.11.2
+numpy==1.21.2
+
+# Please add versions for the following libraries:
+# gseapy
+# sklearn
+# cmocean
+# pydeseq2 (if available on PyPI)
