@@ -61,23 +61,3 @@ if __name__ == "__main__":
     gene_info_df, orf_transform, gene_name_transform, description_transform = Translator()
     print(gene_info_df)
     
-    # print(orf_transform)
-    # print(gene_name_transform)
-    # print(description_transform)
-    
-    # # Get the ORF, Gene name, Discription by pre-build dictionary  
-    # id_orf_transform, id_gene_name_transform, id_discription_transform = Translator()
-    # result_df.insert(0, 'ID', result_df.index)
-    # result_df.insert(1, 'Orf', result_df['ID'].map(id_orf_transform))
-    # result_df.insert(2, 'Gene', result_df['ID'].map(id_gene_name_transform))
-    # result_df.insert(3, 'Discription', result_df['ID'].map(id_discription_transform))
-    # self.result = result_df
-
-    # Get the Estimated Gene Expression
-    # estimated_gene_expression = dds.layers['normed_counts']
-    # estimated_df = pd.DataFrame(estimated_gene_expression.T, 
-    #                                             index=dds.var.index, columns=dds.obs.index) # Turn to dataframe
-    # estimated_df.insert(0, 'ID', estimated_df.index)
-    # estimated_df.insert(1, 'Orf', estimated_df['ID'].map(id_orf_transform))
-    # estimated_df.insert(2, 'Gene', estimated_df['ID'].map(id_gene_name_transform))
-    # self.estimated_gene = estimated_df
