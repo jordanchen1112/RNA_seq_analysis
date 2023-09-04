@@ -145,6 +145,8 @@ class RNASeqPlotter:
 
         plt.show()
 
+
+
     def get_genes(self, query = None, p = 0.05, fc = 2):
         # Get interest genes (query in description / p-vlaue / fold change)
         filter1 = (self.deseq2['log2FoldChange'] > np.log2(fc)) | (self.deseq2['log2FoldChange'] < np.log2(1/fc))
