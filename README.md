@@ -12,6 +12,10 @@
 
 5. Translator.py: Provides the Translator function which links "transcript_id" with attributes like ORF, gene name, and description using a FASTA file.
 
+6. improved_Interactive_plot.py: This script contains the InteractivePlotter class, which reads gene expression data from Excel files and generates an interactive volcano plot.
+
+7. improved_UI_plotter.py: This script uses the Dash framework to provide a web-based interface for users to interact with and visualize the volcano plot.
+
 ## RNA Seq Analysis: Step-by-Step Guide
 
 ### 1. Setup and Installation
